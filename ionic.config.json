@@ -1,0 +1,7 @@
+{
+  "name": "egghead-task-manager",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
