@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "egghead-task-list": {
+      "hosting": {
+        "app": [
+          "egghead-task-list"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "egghead-task-list"
+  }
+}
