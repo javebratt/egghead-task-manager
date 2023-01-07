@@ -1,0 +1,22 @@
+.tasks {
+  &__header {
+    ion-toolbar {
+      --background: #cf11d9;
+      --color: #fff;
+    }
+  }
+  &__content {
+    &__task {
+    }
+    &__task-title {
+    }
+    &__task-description {
+    }
+    &__task-status {
+      margin-top: 4px;
+      ion-badge {
+        padding: 5px;
+      }
+    }
+  }
+}

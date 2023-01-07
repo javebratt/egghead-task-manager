@@ -1,9 +1,35 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>tasks</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ng-container class="tasks">
+  <ion-header class="tasks__header">
+    <ion-toolbar color="primary">
+      <ion-title>My Tickets</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
+  <ion-content class="tasks__content ion-padding">
+    <ion-list lines="none" *ngFor="let task of tasks$ | async">
+      <ion-item class="tasks__content__task" routerLink="task/{{task.id}}">
+        <ion-label class="ion-text-wrap">
+          <h3 class="tasks__content__task-title">{{task.title}}</h3>
+          <p class="tasks__content__task-description">{{task.description}}</p>
+        </ion-label>
+        <div class="tasks__content__task-status" [ngSwitch]="task.status">
+          <ion-badge slot="end" *ngSwitchCase="'todo'" color="tertiary"
+            >To Do</ion-badge
+          >
+          <ion-badge slot="end" *ngSwitchCase="'in-progress'" color="warning"
+            >In Progress</ion-badge
+          >
+          <ion-badge slot="end" *ngSwitchCase="'done'" color="primary"
+            >Completed</ion-badge
+          >
+        </div>
+      </ion-item>
+    </ion-list>
 
-</ion-content>
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button routerLink="task/new">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </ion-content>
+</ng-container>
