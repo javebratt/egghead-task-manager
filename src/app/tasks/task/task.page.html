@@ -1,9 +1,12 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>task</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ng-container *ngIf="task$ | async as task">
+  <ion-header class="task__header">
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tasks"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{task.title}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-
-</ion-content>
+  <ion-content class="task__content ion-padding"> </ion-content>
+</ng-container>
