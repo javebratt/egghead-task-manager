@@ -142,8 +142,8 @@
             "prerender": false,
             "ssr": false,
             "browserTarget": "app:build:production",
-            "firebaseProject": "egghead-task-list",
-            "firebaseHostingSite": "egghead-task-list"
+            "firebaseProject": "task-list-94997",
+            "firebaseHostingSite": "task-list-94997"
           }
         }
       }
