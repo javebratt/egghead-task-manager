@@ -4,12 +4,25 @@ export interface Task {
   description: string;
   status: TaskStatus;
   createdAt: number;
-  assignee: string;
-  attachments: string[];
+  assignee: Assignee;
+  attachments: Attachment[];
 }
 
 export enum TaskStatus {
   TODO = 'todo',
   IN_PROGRESS = 'in-progress',
   DONE = 'done',
+}
+
+interface Assignee {
+  image: string;
+  name?: string;
+  email: string;
+}
+
+interface Attachment {
+  url: string;
+  name: string;
+  size: number;
+  type: 'image' | 'file';
 }
