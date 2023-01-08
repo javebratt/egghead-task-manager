@@ -1,12 +1,85 @@
-<ng-container *ngIf="task$ | async as task">
-  <ion-header class="task__header">
+<ng-container *ngIf="task$ | async as task" class="task">
+  <ion-header>
     <ion-toolbar color="primary">
       <ion-buttons slot="start">
         <ion-back-button defaultHref="/tasks"></ion-back-button>
       </ion-buttons>
-      <ion-title>{{task.title}}</ion-title>
+      <ion-title>{{ task.title }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="task__content ion-padding"> </ion-content>
+  <ion-content class="task__content ion-padding">
+    <ion-item lines="none" class="task__content__description ion-no-padding">
+      <ion-label>
+        <h2>Task Description:</h2>
+        <h3>{{ task.description }}</h3>
+      </ion-label>
+    </ion-item>
+
+    <ion-item lines="none" class="task__content__assignee ion-no-padding">
+      <ion-label position="stacked">Assignee:</ion-label>
+      <ion-chip class="ion-no-margin">
+        <ion-icon
+          *ngIf="!task.assignee.image"
+          color="light"
+          name="person"
+        ></ion-icon>
+        <ion-avatar *ngIf="task.assignee.image">
+          <img [src]="task.assignee.image" />
+        </ion-avatar>
+        <ion-label>{{task.assignee.name ?? task.assignee.email}}</ion-label>
+      </ion-chip>
+    </ion-item>
+
+    <ion-item lines="none" class="task__content__status ion-no-padding">
+      <ion-label position="stacked">Task Status:</ion-label>
+      <ion-select interface="action-sheet" [(ngModel)]="task.status">
+        <ion-select-option value="todo">To Do</ion-select-option>
+        <ion-select-option value="in-progress">In Progress</ion-select-option>
+        <ion-select-option value="done">Done</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item
+      lines="none"
+      class="task__content__attachments-label ion-no-padding"
+    >
+      <ion-label>Attachments:</ion-label>
+      <ion-button slot="end" fill="outline" color="primary">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item
+      lines="none"
+      *ngFor="let attachment of task.attachments"
+      class="task__content__attachments-files"
+    >
+      <ion-icon slot="start" [name]="attachment.type"></ion-icon>
+      <ion-label>
+        <h3>{{ attachment.name}}</h3>
+        <p>{{ attachment.size | fileSize }}</p>
+      </ion-label>
+      <ion-button slot="end" fill="clear">
+        <ion-icon slot="icon-only" name="download"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <div
+      *ngIf="task.attachments.length === 0"
+      class="task__content__attachments-no-files"
+    >
+      <p>Add files to your ticket</p>
+    </div>
+
+    <ion-fab [edge]="true" vertical="top" horizontal="end" slot="fixed">
+      <ion-fab-button color="danger">
+        <ion-icon name="remove"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </ion-content>
+
+  <ion-footer>
+    <ion-button expand="block" color="primary">Save</ion-button>
+  </ion-footer>
 </ng-container>
