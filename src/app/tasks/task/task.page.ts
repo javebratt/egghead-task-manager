@@ -11,15 +11,16 @@ import { Task, TaskStatus } from '../tasks.models';
   styleUrls: ['./task.page.scss'],
 })
 export class TaskPage {
-  editTaskDescriptionStatus$ = new BehaviorSubject<boolean>(false);
+  editTaskDescriptionStatus$ = new BehaviorSubject<boolean>(true);
+  editTaskTitleStatus$ = new BehaviorSubject<boolean>(true);
   task$: Observable<Task> = this.route.params.pipe(
     map((params) => params['taskId'] as string),
     switchMap((taskId) =>
       taskId === 'new'
         ? of({
             id: 'new',
-            title: 'New Task',
-            description: 'You can add the description for your new task here.',
+            title: '',
+            description: '',
             status: TaskStatus.TODO,
             createdAt: 0,
             attachments: [],
@@ -34,7 +35,11 @@ export class TaskPage {
   ) {}
 
   editTaskDescription() {
-    this.editTaskDescriptionStatus$.next(true);
+    this.editTaskDescriptionStatus$.next(false);
+  }
+
+  editTaskTitle() {
+    this.editTaskTitleStatus$.next(false);
   }
 
   deleteTask(taskId: string) {

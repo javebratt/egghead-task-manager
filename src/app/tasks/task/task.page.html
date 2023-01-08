@@ -10,25 +10,31 @@
 
   <ion-content class="task__content ion-padding">
     <ion-item
-      *ngIf="(editTaskDescriptionStatus$ | async) === false"
       lines="none"
-      class="task__content__description ion-no-padding"
+      class="task__content__title ion-no-padding"
+      (click)="editTaskTitle()"
     >
-      <ion-label (click)="editTaskDescription()">
-        <h2>Task Description:</h2>
-        <h3>{{ task.description }}</h3>
-      </ion-label>
+      <ion-label position="stacked"> Task Title: </ion-label>
+      <ion-input
+        type="text"
+        [readonly]="editTaskTitleStatus$ | async"
+        [(ngModel)]="task.title"
+        placeholder="Please enter a title for this task."
+        [class.editable-title]="(editTaskTitleStatus$ | async) === false"
+      ></ion-input>
     </ion-item>
 
     <ion-item
-      *ngIf="editTaskDescriptionStatus$ | async"
       lines="none"
       class="task__content__description ion-no-padding"
+      (click)="editTaskDescription()"
     >
       <ion-label position="stacked"> Task Description: </ion-label>
       <ion-textarea
-        *ngIf="editTaskDescriptionStatus$ | async"
+        [class.editable-description]="(editTaskDescriptionStatus$ | async) === false"
+        [readonly]="editTaskDescriptionStatus$ | async"
         [(ngModel)]="task.description"
+        placeholder="Please enter a description for this task."
       ></ion-textarea>
     </ion-item>
 
