@@ -63,15 +63,8 @@
       (click)="assignTask()"
       class="task__content__assignee ion-no-margin"
     >
-      <ion-icon
-        *ngIf="!task.assignee?.image"
-        color="light"
-        name="person"
-      ></ion-icon>
-      <ion-avatar *ngIf="task.assignee?.image">
-        <img [src]="task.assignee?.image" />
-      </ion-avatar>
-      <ion-label>{{task.assignee?.name ?? 'Assign this task'}}</ion-label>
+      <ion-icon color="light" name="person"></ion-icon>
+      <ion-label>{{task.assignee ?? 'Assign this task'}}</ion-label>
     </ion-chip>
 
     <input

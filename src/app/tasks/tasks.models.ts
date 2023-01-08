@@ -3,8 +3,8 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
-  createdAt: number;
-  assignee?: Assignee;
+  createdAt: number | null;
+  assignee: string | null;
   attachments: Attachment[];
 }
 
@@ -12,11 +12,6 @@ export enum TaskStatus {
   TODO = 'todo',
   IN_PROGRESS = 'in-progress',
   DONE = 'done',
-}
-
-export interface Assignee {
-  image?: string;
-  name: string;
 }
 
 export interface Attachment {

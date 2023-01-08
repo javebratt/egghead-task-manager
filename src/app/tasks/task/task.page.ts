@@ -22,7 +22,7 @@ import {
 } from '@ionic/angular';
 import { BehaviorSubject, lastValueFrom, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
-import { Assignee, Task, TaskStatus } from '../tasks.models';
+import { Task, TaskStatus } from '../tasks.models';
 
 @Component({
   selector: 'app-task',
@@ -43,19 +43,13 @@ export class TaskPage {
             status: TaskStatus.TODO,
             createdAt: 0,
             attachments: [],
+            assignee: null,
           })
         : (docData(doc(this.firestore, `tasks/${taskId}`)) as Observable<Task>)
     )
   );
 
-  team: Assignee[] = [
-    {
-      name: 'Jorge Vergara',
-    },
-    {
-      name: 'Andres Ebratt',
-    },
-  ];
+  team: string[] = ['Jorge Vergara', 'Andres Ebratt', 'John Doe', 'Jane Doe'];
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -135,28 +129,20 @@ export class TaskPage {
   }
 
   async assignTask() {
+    const buttons = this.team.map((member) => ({
+      text: member,
+      data: member,
+    }));
+
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Example header',
       subHeader: 'Example subheader',
       buttons: [
-        {
-          text: 'Jorge Vergara',
-          data: {
-            assignee: 'Jorge Vergara',
-          },
-        },
-        {
-          text: 'Andres Ebratt',
-          data: {
-            assignee: 'Andres Ebratt',
-          },
-        },
+        ...buttons,
         {
           text: 'Cancel',
           role: 'cancel',
-          data: {
-            assignee: null,
-          },
+          data: null,
         },
       ],
     });
@@ -165,15 +151,12 @@ export class TaskPage {
 
     const result = await actionSheet.onDidDismiss();
 
-    if (result.data.assignee === null) {
+    if (!result.data) {
       return;
     }
 
-    const assignee = this.team.find(
-      (member) => member.name === result.data.assignee
-    );
     const task = await lastValueFrom(this.task$.pipe(first()));
-    task.assignee = assignee;
+    task.assignee = result.data;
     const taskReference = doc(this.firestore, `tasks/${task.id}`);
 
     await updateDoc(taskReference, { ...task });
