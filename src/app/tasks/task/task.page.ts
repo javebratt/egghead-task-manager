@@ -1,8 +1,23 @@
 import { Component } from '@angular/core';
-import { doc, docData, Firestore } from '@angular/fire/firestore';
-import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  docData,
+  Firestore,
+  updateDoc,
+} from '@angular/fire/firestore';
+import {
+  getDownloadURL,
+  ref,
+  Storage,
+  uploadBytes,
+} from '@angular/fire/storage';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertController, ToastController } from '@ionic/angular';
+import { BehaviorSubject, lastValueFrom, Observable, of } from 'rxjs';
+import { first, map, switchMap } from 'rxjs/operators';
 import { Task, TaskStatus } from '../tasks.models';
 
 @Component({
@@ -31,7 +46,11 @@ export class TaskPage {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly firestore: Firestore
+    private readonly firestore: Firestore,
+    private readonly storage: Storage,
+    private readonly alertController: AlertController,
+    private readonly router: Router,
+    private readonly toastController: ToastController
   ) {}
 
   editTaskDescription() {
@@ -42,16 +61,63 @@ export class TaskPage {
     this.editTaskTitleStatus$.next(false);
   }
 
-  deleteTask(taskId: string) {
-    console.log('Delete task', taskId);
+  async deleteTask(name: string, taskId: string) {
+    const alert = await this.alertController.create({
+      header: name,
+      message: 'Are you sure you want to delete this task?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Delete',
+          handler: () => {
+            deleteDoc(doc(this.firestore, `tasks/${taskId}`));
+            this.router.navigateByUrl('/tasks');
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
-  downloadAttachment(attachmentUrl: string) {
-    console.log('Download attachment', attachmentUrl);
+  downloadAttachment(name: string, url: string) {
+    const link = document.createElement('a');
+    link.download = name;
+    link.href = url;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
-  addAttachment() {
-    console.log('Add attachment');
+  addAttachment(fileInput: HTMLInputElement) {
+    fileInput.click();
+  }
+
+  async uploadFile($event: any) {
+    const file = $event.target.files[0];
+
+    const task = await lastValueFrom(this.task$.pipe(first()));
+
+    const storageRef = ref(this.storage, `${task.id}/${file.name}`);
+
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+
+    task.attachments.push({
+      url,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
+    const taskReference = doc(this.firestore, `tasks/${task.id}`);
+
+    await updateDoc(taskReference, { ...task });
+
+    return this.presentToast('File Uploaded Successfully');
   }
 
   assignTask() {
@@ -61,12 +127,28 @@ export class TaskPage {
     console.log('Assign task');
   }
 
-  saveTask(task: Task) {
-    console.log(task);
+  async saveTask(task: Task) {
     if (task.id === 'new') {
-      // TODO: Create a new task
+      const taskCollection = collection(this.firestore, `tasks`);
+      const taskReference = await addDoc(taskCollection, { ...task });
+      await updateDoc(taskReference, 'id', taskReference.id);
+      this.presentToast();
+      this.router.navigateByUrl('/tasks');
     } else {
-      // TODO: Update the task
+      const taskReference = doc(this.firestore, `tasks/${task.id}`);
+      await updateDoc(taskReference, { ...task });
+      return this.presentToast();
     }
+  }
+
+  async presentToast(message: string = 'Task Successfully Updated') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      position: 'bottom',
+      color: 'success',
+    });
+
+    await toast.present();
   }
 }

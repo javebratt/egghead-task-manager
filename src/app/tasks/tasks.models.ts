@@ -19,7 +19,7 @@ interface Assignee {
   name: string;
 }
 
-interface Attachment {
+export interface Attachment {
   url: string;
   name: string;
   size: number;

@@ -30,14 +30,14 @@
       }
     }
     &__status {
-      margin: 12px 0;
-      width: auto;
-      ion-select {
-        padding: 8px 20px;
-        background-color: var(--ion-color-primary);
-        border-radius: 5px;
-        color: #ffffff;
+      margin-bottom: 24px;
+      .selected-status {
+        color: var(--ion-color-primary);
       }
     }
   }
+}
+
+.hidden-input {
+  visibility: hidden;
 }

@@ -38,9 +38,30 @@
       ></ion-textarea>
     </ion-item>
 
+    <ion-segment [(ngModel)]="task.status" class="task__content__status">
+      <ion-segment-button
+        value="todo"
+        [class.selected-status]="task.status === 'todo'"
+      >
+        <ion-label>To Do</ion-label>
+      </ion-segment-button>
+      <ion-segment-button
+        value="in-progress"
+        [class.selected-status]="task.status === 'in-progress'"
+      >
+        <ion-label>In Progress</ion-label>
+      </ion-segment-button>
+      <ion-segment-button
+        value="done"
+        [class.selected-status]="task.status === 'done'"
+      >
+        <ion-label>Done</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
     <ion-chip
       (click)="assignTask()"
-      class="task__content__assignee ion-no-margin ion-margin-top ion-margin-bottom"
+      class="task__content__assignee ion-no-margin"
     >
       <ion-icon
         *ngIf="!task.assignee?.image"
@@ -53,16 +74,12 @@
       <ion-label>{{task.assignee?.name ?? 'Assign this task'}}</ion-label>
     </ion-chip>
 
-    <ion-list lines="none" class="task__content__status">
-      <ion-item class="ion-no-padding">
-        <ion-label position="stacked">Task Status:</ion-label>
-        <ion-select interface="action-sheet" [(ngModel)]="task.status">
-          <ion-select-option value="todo">To Do</ion-select-option>
-          <ion-select-option value="in-progress">In Progress</ion-select-option>
-          <ion-select-option value="done">Done</ion-select-option>
-        </ion-select>
-      </ion-item>
-    </ion-list>
+    <input
+      (change)="uploadFile($event)"
+      #fileInput
+      type="file"
+      class="hidden-input"
+    />
 
     <ion-item
       lines="none"
@@ -70,7 +87,7 @@
     >
       <ion-label>Attachments:</ion-label>
       <ion-button
-        (click)="addAttachment()"
+        (click)="addAttachment(fileInput)"
         slot="end"
         fill="outline"
         color="primary"
@@ -84,15 +101,16 @@
       *ngFor="let attachment of task.attachments"
       class="task__content__attachments-files"
     >
-      <ion-icon slot="start" [name]="attachment.type"></ion-icon>
+      <ion-icon slot="start" name="document"></ion-icon>
       <ion-label>
         <h3>{{ attachment.name}}</h3>
         <p>{{ attachment.size | fileSize }}</p>
+        <p>{{ attachment.type }}</p>
       </ion-label>
       <ion-button
         slot="end"
         fill="clear"
-        (click)="downloadAttachment(attachment.url)"
+        (click)="downloadAttachment(attachment.name, attachment.url)"
       >
         <ion-icon slot="icon-only" name="download"></ion-icon>
       </ion-button>
@@ -106,7 +124,7 @@
     </div>
 
     <ion-fab [edge]="true" vertical="top" horizontal="end" slot="fixed">
-      <ion-fab-button color="danger" (click)="deleteTask(task.id)">
+      <ion-fab-button color="danger" (click)="deleteTask(task.title, task.id)">
         <ion-icon name="remove"></ion-icon>
       </ion-fab-button>
     </ion-fab>
