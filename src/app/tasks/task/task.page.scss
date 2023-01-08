@@ -1,9 +1,14 @@
 .task {
   &__content {
     &__assignee {
-      ion-chip {
-        --background: var(--ion-color-primary);
-        --color: #ffffff;
+      --background: var(--ion-color-primary);
+      --color: #ffffff;
+    }
+    &__description {
+      ion-textarea {
+        border: 1px solid #757575;
+        border-radius: 10px;
+        padding: 10px;
       }
     }
     &__attachments-no-files {
@@ -18,7 +23,7 @@
       }
     }
     &__status {
-      margin-bottom: 16px;
+      margin: 12px 0;
       width: auto;
       ion-select {
         padding: 8px 20px;

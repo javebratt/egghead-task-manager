@@ -4,7 +4,7 @@ export interface Task {
   description: string;
   status: TaskStatus;
   createdAt: number;
-  assignee: Assignee;
+  assignee?: Assignee;
   attachments: Attachment[];
 }
 
@@ -15,9 +15,8 @@ export enum TaskStatus {
 }
 
 interface Assignee {
-  image: string;
-  name?: string;
-  email: string;
+  image?: string;
+  name: string;
 }
 
 interface Attachment {
