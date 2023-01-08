@@ -14,7 +14,7 @@ export enum TaskStatus {
   DONE = 'done',
 }
 
-interface Assignee {
+export interface Assignee {
   image?: string;
   name: string;
 }

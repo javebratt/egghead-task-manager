@@ -15,10 +15,14 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, ToastController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  AlertController,
+  ToastController,
+} from '@ionic/angular';
 import { BehaviorSubject, lastValueFrom, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
-import { Task, TaskStatus } from '../tasks.models';
+import { Assignee, Task, TaskStatus } from '../tasks.models';
 
 @Component({
   selector: 'app-task',
@@ -44,13 +48,23 @@ export class TaskPage {
     )
   );
 
+  team: Assignee[] = [
+    {
+      name: 'Jorge Vergara',
+    },
+    {
+      name: 'Andres Ebratt',
+    },
+  ];
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly firestore: Firestore,
     private readonly storage: Storage,
     private readonly alertController: AlertController,
     private readonly router: Router,
-    private readonly toastController: ToastController
+    private readonly toastController: ToastController,
+    private readonly actionSheetCtrl: ActionSheetController
   ) {}
 
   editTaskDescription() {
@@ -120,11 +134,51 @@ export class TaskPage {
     return this.presentToast('File Uploaded Successfully');
   }
 
-  assignTask() {
-    // Implement assign task
-    // TODO: Open a list of the team members.
-    // TODO: Get the value from that list of members and assign it to the task
-    console.log('Assign task');
+  async assignTask() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Example header',
+      subHeader: 'Example subheader',
+      buttons: [
+        {
+          text: 'Jorge Vergara',
+          data: {
+            assignee: 'Jorge Vergara',
+          },
+        },
+        {
+          text: 'Andres Ebratt',
+          data: {
+            assignee: 'Andres Ebratt',
+          },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          data: {
+            assignee: null,
+          },
+        },
+      ],
+    });
+
+    await actionSheet.present();
+
+    const result = await actionSheet.onDidDismiss();
+
+    if (result.data.assignee === null) {
+      return;
+    }
+
+    const assignee = this.team.find(
+      (member) => member.name === result.data.assignee
+    );
+    const task = await lastValueFrom(this.task$.pipe(first()));
+    task.assignee = assignee;
+    const taskReference = doc(this.firestore, `tasks/${task.id}`);
+
+    await updateDoc(taskReference, { ...task });
+
+    return this.presentToast();
   }
 
   async saveTask(task: Task) {
