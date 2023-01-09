@@ -17,28 +17,50 @@
       <ion-label position="stacked"> Task Title: </ion-label>
       <ion-input
         type="text"
-        [readonly]="editTaskTitleStatus$ | async"
+        [readonly]="!editTaskTitleStatus"
         [(ngModel)]="task.title"
         placeholder="Please enter a title for this task."
-        [class.editable-title]="(editTaskTitleStatus$ | async) === false"
+        [class.editable-title]="editTaskTitleStatus"
       ></ion-input>
+      <ion-button
+        (click)="saveTaskTitle(task.title)"
+        class="edit-button"
+        slot="end"
+        fill="outline"
+        *ngIf="editTaskTitleStatus"
+      >
+        <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+      </ion-button>
     </ion-item>
 
     <ion-item
       lines="none"
-      class="task__content__description ion-no-padding"
+      class="task__content__description ion-no-padding ion-margin-bottom"
       (click)="editTaskDescription()"
     >
       <ion-label position="stacked"> Task Description: </ion-label>
       <ion-textarea
-        [class.editable-description]="(editTaskDescriptionStatus$ | async) === false"
-        [readonly]="editTaskDescriptionStatus$ | async"
+        [class.editable-description]="editTaskDescriptionStatus"
+        [readonly]="!editTaskDescriptionStatus"
         [(ngModel)]="task.description"
         placeholder="Please enter a description for this task."
       ></ion-textarea>
+      <ion-button
+        (click)="saveTaskDescription(task.description)"
+        class="edit-button"
+        slot="end"
+        fill="outline"
+        [class.hidden-input]="!editTaskDescriptionStatus"
+      >
+        <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+      </ion-button>
     </ion-item>
 
-    <ion-segment [(ngModel)]="task.status" class="task__content__status">
+    <ion-segment
+      [value]="task.status"
+      class="task__content__status"
+      (ionChange)="editTaskStatus(task.status)"
+    >
       <ion-segment-button
         value="todo"
         [class.selected-status]="task.status === 'todo'"
@@ -115,17 +137,18 @@
     >
       <p>Add files to your ticket</p>
     </div>
-
-    <ion-fab [edge]="true" vertical="top" horizontal="end" slot="fixed">
-      <ion-fab-button color="danger" (click)="deleteTask(task.title, task.id)">
-        <ion-icon name="remove"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
   </ion-content>
 
-  <ion-footer>
-    <ion-button expand="block" color="primary" (click)="saveTask(task)"
-      >Save Task</ion-button
+  <ion-footer class="ion-padding">
+    <ion-button expand="block" color="primary" (click)="confirm()"
+      >Confirm</ion-button
+    >
+    <ion-button
+      class="ion-margin-top"
+      expand="block"
+      color="danger"
+      (click)="deleteTask(task.title, task.id)"
+      >Delete Task</ion-button
     >
   </ion-footer>
 </ng-container>

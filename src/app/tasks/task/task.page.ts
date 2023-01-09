@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import {
   addDoc,
@@ -18,9 +19,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
   AlertController,
+  LoadingController,
   ToastController,
 } from '@ionic/angular';
-import { BehaviorSubject, lastValueFrom, Observable, of } from 'rxjs';
+import { lastValueFrom, Observable, of } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { Task, TaskStatus } from '../tasks.models';
 
@@ -30,8 +32,9 @@ import { Task, TaskStatus } from '../tasks.models';
   styleUrls: ['./task.page.scss'],
 })
 export class TaskPage {
-  editTaskDescriptionStatus$ = new BehaviorSubject<boolean>(true);
-  editTaskTitleStatus$ = new BehaviorSubject<boolean>(true);
+  editTaskDescriptionStatus = false;
+  editTaskTitleStatus = false;
+
   task$: Observable<Task> = this.route.params.pipe(
     map((params) => params['taskId'] as string),
     switchMap((taskId) =>
@@ -58,15 +61,43 @@ export class TaskPage {
     private readonly alertController: AlertController,
     private readonly router: Router,
     private readonly toastController: ToastController,
-    private readonly actionSheetCtrl: ActionSheetController
+    private readonly actionSheetCtrl: ActionSheetController,
+    private readonly location: Location,
+    private readonly loadingController: LoadingController
   ) {}
 
   editTaskDescription() {
-    this.editTaskDescriptionStatus$.next(false);
+    this.editTaskDescriptionStatus = true;
+  }
+
+  async saveTaskDescription(description: string) {
+    setTimeout(() => {
+      this.editTaskDescriptionStatus = false;
+    });
+    const task = await lastValueFrom(this.task$.pipe(first()));
+    task.description = description;
+    this.saveTask(task);
   }
 
   editTaskTitle() {
-    this.editTaskTitleStatus$.next(false);
+    this.editTaskTitleStatus = true;
+  }
+
+  async saveTaskTitle(title: string) {
+    setTimeout(() => {
+      this.editTaskTitleStatus = false;
+    });
+
+    const task = await lastValueFrom(this.task$.pipe(first()));
+    task.title = title;
+    this.saveTask(task);
+  }
+
+  editTaskStatus(status: TaskStatus) {
+    this.task$.pipe(first()).subscribe((task) => {
+      task.status = status;
+      this.saveTask(task);
+    });
   }
 
   async deleteTask(name: string, taskId: string) {
@@ -105,6 +136,8 @@ export class TaskPage {
   }
 
   async uploadFile($event: any) {
+    const loading = await this.loadingController.create({});
+    await loading.present();
     const file = $event.target.files[0];
 
     const task = await lastValueFrom(this.task$.pipe(first()));
@@ -121,11 +154,8 @@ export class TaskPage {
       type: file.type,
     });
 
-    const taskReference = doc(this.firestore, `tasks/${task.id}`);
-
-    await updateDoc(taskReference, { ...task });
-
-    return this.presentToast('File Uploaded Successfully');
+    await this.saveTask(task);
+    loading.dismiss();
   }
 
   async assignTask() {
@@ -157,25 +187,29 @@ export class TaskPage {
 
     const task = await lastValueFrom(this.task$.pipe(first()));
     task.assignee = result.data;
-    const taskReference = doc(this.firestore, `tasks/${task.id}`);
 
-    await updateDoc(taskReference, { ...task });
-
-    return this.presentToast();
+    return this.saveTask(task);
   }
 
   async saveTask(task: Task) {
+    console.log(task);
     if (task.id === 'new') {
       const taskCollection = collection(this.firestore, `tasks`);
       const taskReference = await addDoc(taskCollection, { ...task });
       await updateDoc(taskReference, 'id', taskReference.id);
+      this.task$ = of({ ...task, id: taskReference.id });
+      // await this.saveTask({ ...task, id: taskReference.id });
       this.presentToast();
-      this.router.navigateByUrl('/tasks');
+      this.location.replaceState(`/tasks/task/${taskReference.id}`);
     } else {
       const taskReference = doc(this.firestore, `tasks/${task.id}`);
       await updateDoc(taskReference, { ...task });
       return this.presentToast();
     }
+  }
+
+  confirm() {
+    this.router.navigateByUrl('/tasks');
   }
 
   async presentToast(message: string = 'Task Successfully Updated') {
