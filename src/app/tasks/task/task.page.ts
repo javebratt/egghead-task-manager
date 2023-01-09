@@ -1,5 +1,4 @@
-import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   addDoc,
   collection,
@@ -22,8 +21,7 @@ import {
   LoadingController,
   ToastController,
 } from '@ionic/angular';
-import { lastValueFrom, Observable, of } from 'rxjs';
-import { first, map, switchMap } from 'rxjs/operators';
+import { first, lastValueFrom } from 'rxjs';
 import { Task, TaskStatus } from '../tasks.models';
 
 @Component({
@@ -31,27 +29,8 @@ import { Task, TaskStatus } from '../tasks.models';
   templateUrl: './task.page.html',
   styleUrls: ['./task.page.scss'],
 })
-export class TaskPage {
-  editTaskDescriptionStatus = false;
-  editTaskTitleStatus = false;
-
-  task$: Observable<Task> = this.route.params.pipe(
-    map((params) => params['taskId'] as string),
-    switchMap((taskId) =>
-      taskId === 'new'
-        ? of({
-            id: 'new',
-            title: '',
-            description: '',
-            status: TaskStatus.TODO,
-            createdAt: 0,
-            attachments: [],
-            assignee: null,
-          })
-        : (docData(doc(this.firestore, `tasks/${taskId}`)) as Observable<Task>)
-    )
-  );
-
+export class TaskPage implements OnInit {
+  task!: Task;
   team: string[] = ['Jorge Vergara', 'Andres Ebratt', 'John Doe', 'Jane Doe'];
 
   constructor(
@@ -62,42 +41,29 @@ export class TaskPage {
     private readonly router: Router,
     private readonly toastController: ToastController,
     private readonly actionSheetCtrl: ActionSheetController,
-    private readonly location: Location,
     private readonly loadingController: LoadingController
   ) {}
 
-  editTaskDescription() {
-    this.editTaskDescriptionStatus = true;
+  ngOnInit() {
+    this.setCurrentTask();
   }
-
-  async saveTaskDescription(description: string) {
-    setTimeout(() => {
-      this.editTaskDescriptionStatus = false;
-    });
-    const task = await lastValueFrom(this.task$.pipe(first()));
-    task.description = description;
-    this.saveTask(task);
-  }
-
-  editTaskTitle() {
-    this.editTaskTitleStatus = true;
-  }
-
-  async saveTaskTitle(title: string) {
-    setTimeout(() => {
-      this.editTaskTitleStatus = false;
-    });
-
-    const task = await lastValueFrom(this.task$.pipe(first()));
-    task.title = title;
-    this.saveTask(task);
-  }
-
-  editTaskStatus(status: TaskStatus) {
-    this.task$.pipe(first()).subscribe((task) => {
-      task.status = status;
-      this.saveTask(task);
-    });
+  async setCurrentTask() {
+    const taskId: string = this.route.snapshot.params['taskId'];
+    if (taskId === 'new') {
+      this.task = {
+        id: 'new',
+        title: '',
+        description: '',
+        status: TaskStatus.TODO,
+        createdAt: 0,
+        attachments: [],
+        assignee: null,
+      };
+    } else {
+      this.task = (await lastValueFrom(
+        docData(doc(this.firestore, `tasks/${taskId}`)).pipe(first())
+      )) as Task;
+    }
   }
 
   async deleteTask(name: string, taskId: string) {
@@ -140,22 +106,19 @@ export class TaskPage {
     await loading.present();
     const file = $event.target.files[0];
 
-    const task = await lastValueFrom(this.task$.pipe(first()));
-
-    const storageRef = ref(this.storage, `${task.id}/${file.name}`);
+    const storageRef = ref(this.storage, `${this.task.id}/${file.name}`);
 
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
-    task.attachments.push({
+    loading.dismiss();
+
+    this.task.attachments.push({
       url,
       name: file.name,
       size: file.size,
       type: file.type,
     });
-
-    await this.saveTask(task);
-    loading.dismiss();
   }
 
   async assignTask() {
@@ -185,31 +148,23 @@ export class TaskPage {
       return;
     }
 
-    const task = await lastValueFrom(this.task$.pipe(first()));
-    task.assignee = result.data;
-
-    return this.saveTask(task);
+    this.task.assignee = result.data;
   }
 
-  async saveTask(task: Task) {
-    console.log(task);
-    if (task.id === 'new') {
+  async saveTask() {
+    if (this.task.id === 'new') {
       const taskCollection = collection(this.firestore, `tasks`);
-      const taskReference = await addDoc(taskCollection, { ...task });
+      const taskReference = await addDoc(taskCollection, { ...this.task });
       await updateDoc(taskReference, 'id', taskReference.id);
-      this.task$ = of({ ...task, id: taskReference.id });
-      // await this.saveTask({ ...task, id: taskReference.id });
+      this.task.id = taskReference.id;
+
       this.presentToast();
-      this.location.replaceState(`/tasks/task/${taskReference.id}`);
+      this.router.navigateByUrl('/tasks');
     } else {
-      const taskReference = doc(this.firestore, `tasks/${task.id}`);
-      await updateDoc(taskReference, { ...task });
+      const taskReference = doc(this.firestore, `tasks/${this.task.id}`);
+      await updateDoc(taskReference, { ...this.task });
       return this.presentToast();
     }
-  }
-
-  confirm() {
-    this.router.navigateByUrl('/tasks');
   }
 
   async presentToast(message: string = 'Task Successfully Updated') {

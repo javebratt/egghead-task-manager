@@ -1,4 +1,4 @@
-<ng-container *ngIf="task$ | async as task" class="task">
+<ng-container *ngIf="task" class="task">
   <ion-header>
     <ion-toolbar color="primary">
       <ion-buttons slot="start">
@@ -9,58 +9,27 @@
   </ion-header>
 
   <ion-content class="task__content ion-padding">
-    <ion-item
-      lines="none"
-      class="task__content__title ion-no-padding"
-      (click)="editTaskTitle()"
-    >
+    <ion-item lines="none" class="task__content__title ion-no-padding">
       <ion-label position="stacked"> Task Title: </ion-label>
       <ion-input
         type="text"
-        [readonly]="!editTaskTitleStatus"
         [(ngModel)]="task.title"
         placeholder="Please enter a title for this task."
-        [class.editable-title]="editTaskTitleStatus"
       ></ion-input>
-      <ion-button
-        (click)="saveTaskTitle(task.title)"
-        class="edit-button"
-        slot="end"
-        fill="outline"
-        *ngIf="editTaskTitleStatus"
-      >
-        <ion-icon slot="icon-only" name="checkmark"></ion-icon>
-      </ion-button>
     </ion-item>
 
     <ion-item
       lines="none"
       class="task__content__description ion-no-padding ion-margin-bottom"
-      (click)="editTaskDescription()"
     >
       <ion-label position="stacked"> Task Description: </ion-label>
       <ion-textarea
-        [class.editable-description]="editTaskDescriptionStatus"
-        [readonly]="!editTaskDescriptionStatus"
         [(ngModel)]="task.description"
         placeholder="Please enter a description for this task."
       ></ion-textarea>
-      <ion-button
-        (click)="saveTaskDescription(task.description)"
-        class="edit-button"
-        slot="end"
-        fill="outline"
-        [class.hidden-input]="!editTaskDescriptionStatus"
-      >
-        <ion-icon slot="icon-only" name="checkmark"></ion-icon>
-      </ion-button>
     </ion-item>
 
-    <ion-segment
-      [value]="task.status"
-      class="task__content__status"
-      (ionChange)="editTaskStatus(task.status)"
-    >
+    <ion-segment [(ngModel)]="task.status" class="task__content__status">
       <ion-segment-button
         value="todo"
         [class.selected-status]="task.status === 'todo'"
@@ -140,8 +109,8 @@
   </ion-content>
 
   <ion-footer class="ion-padding">
-    <ion-button expand="block" color="primary" (click)="confirm()"
-      >Confirm</ion-button
+    <ion-button expand="block" color="primary" (click)="saveTask()"
+      >Save Task</ion-button
     >
     <ion-button
       class="ion-margin-top"
