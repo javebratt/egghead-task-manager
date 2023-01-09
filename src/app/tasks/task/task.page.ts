@@ -105,8 +105,10 @@ export class TaskPage implements OnInit {
     const loading = await this.loadingController.create({});
     await loading.present();
     const file = $event.target.files[0];
-
-    const storageRef = ref(this.storage, `${this.task.id}/${file.name}`);
+    const storageRef = ref(
+      this.storage,
+      `${file.name}-${new Date().toISOString()}`
+    );
 
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
