@@ -47,6 +47,7 @@ export class TaskPage implements OnInit {
   ngOnInit() {
     this.setCurrentTask();
   }
+
   async setCurrentTask() {
     const taskId: string = this.route.snapshot.params['taskId'];
     if (taskId === 'new') {
@@ -158,15 +159,13 @@ export class TaskPage implements OnInit {
       const taskCollection = collection(this.firestore, `tasks`);
       const taskReference = await addDoc(taskCollection, { ...this.task });
       await updateDoc(taskReference, 'id', taskReference.id);
-      this.task.id = taskReference.id;
-
-      this.presentToast();
-      this.router.navigateByUrl('/tasks');
+      // this.task.id = taskReference.id;
     } else {
       const taskReference = doc(this.firestore, `tasks/${this.task.id}`);
       await updateDoc(taskReference, { ...this.task });
-      return this.presentToast();
     }
+    this.presentToast();
+    this.router.navigateByUrl('/tasks');
   }
 
   async presentToast(message: string = 'Task Successfully Updated') {
