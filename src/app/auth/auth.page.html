@@ -1,9 +1,29 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>auth</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="auth-page">
+    <h1 class="ion-text-center">{{ pageTitle }}</h1>
 
-<ion-content>
+    <ion-item>
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input type="email" [(ngModel)]="credentials.email"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="authMode !== 'reset'">
+      <ion-label position="stacked">Password</ion-label>
+      <ion-input type="password" [(ngModel)]="credentials.password"></ion-input>
+    </ion-item>
+    <ion-button expand="block" (click)="handleAuthForm(credentials)"
+      >Continue</ion-button
+    >
 
+    <div *ngIf="authMode === 'login'">
+      <p class="ion-text-end">can't log in?</p>
+
+      <ion-button expand="block" fill="clear" routerLink="/auth/reset">
+        Forgot Password
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" routerLink="/auth/signup">
+        Create a new account
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

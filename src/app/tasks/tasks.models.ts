@@ -6,6 +6,7 @@ export interface Task {
   createdAt: number | null;
   assignee: string | null;
   attachments: Attachment[];
+  user: string;
 }
 
 export enum TaskStatus {

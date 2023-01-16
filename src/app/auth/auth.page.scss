@@ -1,0 +1,16 @@
+ion-content {
+  .auth-page {
+    h1 {
+      margin-bottom: 32px;
+    }
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+ion-button {
+  margin-top: 16px;
+}

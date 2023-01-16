@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import {
   addDoc,
   collection,
@@ -41,7 +42,8 @@ export class TaskPage implements OnInit {
     private readonly router: Router,
     private readonly toastController: ToastController,
     private readonly actionSheetCtrl: ActionSheetController,
-    private readonly loadingController: LoadingController
+    private readonly loadingController: LoadingController,
+    private readonly auth: Auth
   ) {}
 
   ngOnInit() {
@@ -59,6 +61,7 @@ export class TaskPage implements OnInit {
         createdAt: 0,
         attachments: [],
         assignee: null,
+        user: '',
       };
     } else {
       this.task = (await lastValueFrom(
@@ -155,11 +158,19 @@ export class TaskPage implements OnInit {
   }
 
   async saveTask() {
+    const userId: string | null = this.auth.currentUser
+      ? this.auth.currentUser.uid
+      : null;
+    if (!userId) {
+      return;
+    }
+
+    this.task.user = userId;
+
     if (this.task.id === 'new') {
       const taskCollection = collection(this.firestore, `tasks`);
       const taskReference = await addDoc(taskCollection, { ...this.task });
       await updateDoc(taskReference, 'id', taskReference.id);
-      // this.task.id = taskReference.id;
     } else {
       const taskReference = doc(this.firestore, `tasks/${this.task.id}`);
       await updateDoc(taskReference, { ...this.task });

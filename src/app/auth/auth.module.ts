@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
@@ -13,8 +13,9 @@ import { AuthPage } from './auth.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    AuthPageRoutingModule
+    AuthPageRoutingModule,
+    FormsModule,
   ],
-  declarations: [AuthPage]
+  declarations: [AuthPage],
 })
 export class AuthPageModule {}
