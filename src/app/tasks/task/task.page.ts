@@ -22,7 +22,7 @@ import {
   LoadingController,
   ToastController,
 } from '@ionic/angular';
-import { first, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, map, switchMap } from 'rxjs';
 import { Task, TaskStatus } from '../tasks.models';
 
 @Component({
@@ -31,8 +31,17 @@ import { Task, TaskStatus } from '../tasks.models';
   styleUrls: ['./task.page.scss'],
 })
 export class TaskPage implements OnInit {
-  task!: Task;
   team: string[] = ['Jorge Vergara', 'Andres Ebratt', 'John Doe', 'Jane Doe'];
+  task$ = new BehaviorSubject<Task>({
+    id: 'new',
+    title: '',
+    description: '',
+    status: TaskStatus.TODO,
+    createdAt: 0,
+    attachments: [],
+    assignee: null,
+    user: '',
+  });
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -47,27 +56,17 @@ export class TaskPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.setCurrentTask();
-  }
-
-  async setCurrentTask() {
-    const taskId: string = this.route.snapshot.params['taskId'];
-    if (taskId === 'new') {
-      this.task = {
-        id: 'new',
-        title: '',
-        description: '',
-        status: TaskStatus.TODO,
-        createdAt: 0,
-        attachments: [],
-        assignee: null,
-        user: '',
-      };
-    } else {
-      this.task = (await lastValueFrom(
-        docData(doc(this.firestore, `tasks/${taskId}`)).pipe(first())
-      )) as Task;
-    }
+    this.route.params
+      .pipe(
+        map((params) => params['taskId'] as string),
+        switchMap((taskId: string) =>
+          docData(doc(this.firestore, `tasks/${taskId}`))
+        ),
+        map((task$) => task$ as Task)
+      )
+      .subscribe((task$) => {
+        this.task$.next(task$);
+      });
   }
 
   async deleteTask(name: string, taskId: string) {
@@ -118,13 +117,14 @@ export class TaskPage implements OnInit {
     const url = await getDownloadURL(storageRef);
 
     loading.dismiss();
-
-    this.task.attachments.push({
+    const files = this.task$.value.attachments;
+    files.push({
       url,
       name: file.name,
       size: file.size,
       type: file.type,
     });
+    this.task$.next({ ...this.task$.value, attachments: files });
   }
 
   async assignTask() {
@@ -134,8 +134,8 @@ export class TaskPage implements OnInit {
     }));
 
     const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Example header',
-      subHeader: 'Example subheader',
+      header: 'Team',
+      subHeader: 'Pick a team member',
       buttons: [
         ...buttons,
         {
@@ -153,8 +153,7 @@ export class TaskPage implements OnInit {
     if (!result.data) {
       return;
     }
-
-    this.task.assignee = result.data;
+    this.task$.next({ ...this.task$.value, assignee: result.data });
   }
 
   async saveTask() {
@@ -165,16 +164,19 @@ export class TaskPage implements OnInit {
       return;
     }
 
-    this.task.user = userId;
+    const task = this.task$.value;
 
-    if (this.task.id === 'new') {
+    task.user = userId;
+
+    if (task.id === 'new') {
       const taskCollection = collection(this.firestore, `tasks`);
-      const taskReference = await addDoc(taskCollection, { ...this.task });
+      const taskReference = await addDoc(taskCollection, { ...task });
       await updateDoc(taskReference, 'id', taskReference.id);
     } else {
-      const taskReference = doc(this.firestore, `tasks/${this.task.id}`);
-      await updateDoc(taskReference, { ...this.task });
+      const taskReference = doc(this.firestore, `tasks/${task.id}`);
+      await updateDoc(taskReference, { ...task });
     }
+
     this.presentToast();
     this.router.navigateByUrl('/tasks');
   }

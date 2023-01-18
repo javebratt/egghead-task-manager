@@ -1,4 +1,4 @@
-<ng-container *ngIf="task" class="task">
+<ng-container *ngIf="task$ | async as task" class="task">
   <ion-header>
     <ion-toolbar color="primary">
       <ion-buttons slot="start">
