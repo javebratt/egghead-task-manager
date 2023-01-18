@@ -105,12 +105,16 @@ export class TaskPage implements OnInit {
   }
 
   async uploadFile($event: any) {
+    if (!this.auth.currentUser) {
+      return;
+    }
+
     const loading = await this.loadingController.create({});
     await loading.present();
     const file = $event.target.files[0];
     const storageRef = ref(
       this.storage,
-      `${file.name}-${new Date().toISOString()}`
+      `${this.auth.currentUser.uid}/${file.name}-${new Date().toISOString()}`
     );
 
     await uploadBytes(storageRef, file);
