@@ -31,6 +31,7 @@ Lessons:
 - Add signup feature.
 - Add password reset feature.
   - Don't let attackers find users here!
+- Authentication Guards with AngularFire
 - Go back to the database and add the user ID to the tasks.
 - Security Rules: Only authenticated users can see the data.
 - Security Rules: Only the user that created the task can view/edit that task.

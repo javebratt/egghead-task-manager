@@ -21,6 +21,7 @@ export class TasksPage {
   tasks$ = authState(this.auth).pipe(
     switchMap((user) => {
       if (user) {
+        console.log(user.uid);
         return collectionData(
           query(
             collection(this.firestore, 'tasks'),
@@ -28,6 +29,7 @@ export class TasksPage {
           )
         ) as Observable<Task[]>;
       } else {
+        console.log('no user, returning empty');
         this.router.navigateByUrl('/auth/login');
         return EMPTY;
       }
