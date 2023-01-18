@@ -14,7 +14,7 @@ Lessons:
 - How we build the app, the options you have, and initializing Firebase with the `ng add @angular/fire` schematic.
 - A view of the Firebase Console anf the Firebase Services available for us.
 
-Cloud Firestore:
+### Cloud Firestore
 
 - With example data show how we structure that data in Firestore, what collections and documents are.
 - Fetch a list of items and display it on your application.
@@ -24,7 +24,7 @@ Cloud Firestore:
 - Delete an item from the database
   - Good Practice: Destructive database operations should have a confirmation step.
 
-Firebase Authentication:
+### Firebase Authentication
 
 - Quick explain over the authentication page design.
 - Add login feature.
@@ -38,7 +38,7 @@ Firebase Authentication:
 - Firestore query data for the specific user.
 - Security Rules refactor, add functions to avoid repeating yourself.
 
-Cloud Storage:
+### Cloud Storage
 
 - Upload files to Cloud Storage
   - Avoid repeated names!
@@ -46,3 +46,13 @@ Cloud Storage:
 - Storage Security Rules: Only authenticated users can upload/view files.
 - Storage Security Rules: Only allow specific types of files.
 - Storage Security Rules: Only allow files below a certain size.
+
+### Cloud Functions
+
+- Short intro to Firebase Cloud Functions, what they are and what they're used for.
+- Firestore Triggers: Listening to new documents and updating them.
+
+### Cloud Functions Extensions
+
+- Explain what they are and the benefit.
+- Show an example with the delete user data extension: https://extensions.dev/extensions/firebase/delete-user-data
