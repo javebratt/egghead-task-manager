@@ -52,5 +52,3 @@ The course is subdivided in 4 modules: **Cloud Firestore**, **Firebase Authentic
 
 - Short intro to Firebase Cloud Functions, what they are and what they're used for.
 - Firestore Triggers: Listening to new documents and updating them.
-- Explain what Function Extensions are and the benefit of using them.
-- Show an example with the delete user data extension: https://extensions.dev/extensions/firebase/delete-user-data
