@@ -4,15 +4,15 @@ Example application for EggHead course.
 
 The course is about full stack development with Angular and Firebase.
 
-## Tentative Lesson List
+## Lesson List
 
-The course is subdivided in 3 modules: **Cloud Firestore**, **Firebase Authentication**, and **Cloud Storage**.
+The course is subdivided in 4 modules: **Cloud Firestore**, **Firebase Authentication**, **Cloud Storage**, and **Cloud Functions**.
 
-Lessons:
+### Introduction
 
 - Course Intro explaining what we'll go through and the example application.
 - How we build the app, the options you have, and initializing Firebase with the `ng add @angular/fire` schematic.
-- A view of the Firebase Console anf the Firebase Services available for us.
+- A view of the Firebase Console and the Firebase Services available for us.
 
 ### Cloud Firestore
 
@@ -52,8 +52,5 @@ Lessons:
 
 - Short intro to Firebase Cloud Functions, what they are and what they're used for.
 - Firestore Triggers: Listening to new documents and updating them.
-
-### Cloud Functions Extensions
-
-- Explain what they are and the benefit.
+- Explain what Function Extensions are and the benefit of using them.
 - Show an example with the delete user data extension: https://extensions.dev/extensions/firebase/delete-user-data
