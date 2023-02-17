@@ -1,16 +1,16 @@
 <ng-container class="tasks">
   <ion-header class="tasks__header">
-    <ion-toolbar color="primary">
+    <ion-toolbar>
       <ion-title>My Tickets</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-content class="tasks__content ion-padding">
     <ion-list lines="none" *ngFor="let task of tasks$ | async">
-      <ion-item class="tasks__content__task" routerLink="task/{{task.id}}">
+      <ion-item routerLink="task/{{task.id}}">
         <ion-label class="ion-text-wrap">
-          <h3 class="tasks__content__task-title">{{task.title}}</h3>
-          <p class="tasks__content__task-description">{{task.description}}</p>
+          <h3>{{task.title}}</h3>
+          <p>{{task.description}}</p>
         </ion-label>
         <div class="tasks__content__task-status" [ngSwitch]="task.status">
           <ion-badge slot="end" *ngSwitchCase="'todo'" color="tertiary"
