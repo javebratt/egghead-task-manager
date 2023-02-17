@@ -29,7 +29,6 @@ export class TasksPage {
           )
         ) as Observable<Task[]>;
       } else {
-        console.log('no user, returning empty');
         this.router.navigateByUrl('/auth/login');
         return EMPTY;
       }
