@@ -31,7 +31,7 @@ export class AuthPage {
   }
 
   setPageTitle() {
-    const authMode: string = this.route.snapshot.params['authMode'];
+    this.authMode = this.route.snapshot.params['authMode'];
     switch (this.authMode) {
       case 'reset':
         this.pageTitle = 'Reset Password';
