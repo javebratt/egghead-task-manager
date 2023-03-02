@@ -6,7 +6,7 @@ The course is about full stack development with Angular and Firebase.
 
 ## Lesson List
 
-The course is subdivided in 4 modules: **Cloud Firestore**, **Firebase Authentication**, **Cloud Storage**, and **Cloud Functions**.
+The course is subdivided in 3 modules: **Cloud Firestore**, **Firebase Authentication**, and **Cloud Storage**.
 
 ### Introduction
 
@@ -47,8 +47,3 @@ The course is subdivided in 4 modules: **Cloud Firestore**, **Firebase Authentic
 - Storage Security Rules: Only authenticated users can upload/view files.
 - Storage Security Rules: Only allow specific types of files.
 - Storage Security Rules: Only allow files below a certain size.
-
-### Cloud Functions
-
-- Short intro to Firebase Cloud Functions, what they are and what they're used for.
-- Firestore Triggers: Listening to new documents and updating them.
